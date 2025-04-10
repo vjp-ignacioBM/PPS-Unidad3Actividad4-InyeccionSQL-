@@ -37,9 +37,6 @@ Vamos realizando operaciones:
 docker-compose up -d
 ~~~
 
-![](images/sqli1.png)
-
-
 ### Creación de base de datos
 
 Para crear la Base de datos que vamos a utilizar para esta actividad tenemos varias opciones:
@@ -61,7 +58,7 @@ mysql -u root -p
 ~~~
 Puedes ver el proceso en a siguiente imagen:
 
-![](images/sqli9.png)
+![](images/1.png)
 
 y una vez conectado introducimos las consultas sql necesarias para crear la base de datos, tabla e introducir los datos de los usuarios:
 
@@ -78,7 +75,7 @@ INSERT INTO usuarios (usuario, contrasenya) VALUES ('admin', '1234'), ('usuario'
 
 Vemos como se ha creado correctamente, tanto Base de Datos, como tabla y usuarios:
 
-![](images/sqli10.png)
+![](images/2.png)
 
 
 **OPCIÓN 2: a través de PHPmyAdmin**
@@ -88,41 +85,10 @@ Vemos como se ha creado correctamente, tanto Base de Datos, como tabla y usuario
 
 - Al pulsar la opción de sql, podemos ejecutar las sentencias de sql que necesitemos.
 
-![](images/sqli15.png)
+![](images/3.png)
 
 - Por lo tanto, tan sólo tenemos que introducir las sentencias SQL del apartado anterior.
 
-![](images/sqli16.png)
-
-
-**OPCIÓN 3: completamente de manera gráfica**
----
-
-- Accedemos via web al servicio de phpmyadmin que tenemos instalado: <http://localhost:8080>
-
-![](images/sqli2.png)
-
-- Creamos una base de datos nueva, pulsando el botón de _Nueva_
-
-![](images/sqli3.png)
-
-- Vamos a llamar a la tabla SQLi
-
-![](images/sqli4.png)
-
-- Una vez creada, inmediatamente nos sugiere que creemos una tabla nueva. La tabla que necesitamos se llamará **Usuarios* y debe de tener 3 columnas:**id, nombre y contrasenya**, cada una con su tipo de valor correspondiente.
-
-![](images/sqli6.png)
-
-- Una vez creada podemos introducir los valores de los usuarios que queramos pulsando en **Insertar**
-
-![](images/sqli7.png)
-
-- e introducimos los valores que queremos. 
-
-![](images/sqli8.png)
-
- 
 ### Crear página web en Apache
 
 Vamos a crear una web con la que podamos explotar la vulnerabilidad de Inyección SQL. Esta aplicación o código debe de estar alojado en nuestro servidor web Apache.
@@ -131,7 +97,7 @@ Recordamos que en nuestro docker-compose hemos creado un volumen bind-mount para
 
 - Me situo en la carpeta _./www_ y creo una carpeta con nombre SQLi  para esta actividad.
 
-![](images/sqli17.png)
+![](images/4.png)
 
 - Creo dentro de esa carpeta un archivo PHP con nombre **login1.php**, con el siguiente contenido:
 
@@ -170,13 +136,15 @@ $conn = new mysqli("database", "root", "password", "SQLi");
 ~~~
 Esta página nos muestra dos campos para que introduzcamos nuestro usuario y nuestra contraseña.
 
-![](images/sqli18.png)
+![](images/5.png)
+
+![](images/6.png)
 
 Podemos ver los datos de nuestros usuarios desde PHPMyAdmin en la siguientes dirección: <http://localhost:8080/index.php?route=/sql&pos=0&db=SQLi&table=usuarios>
 
 Como podemos ver en la imagen, el usuario **admin** tiene contraseña **admin123**.
 
-![](images/sqli26.png)
+![](images/7.png)
 
 Con los datos que hemos introducido en los campos de consulta, hace una consulta a la BBDD para ver si el usuario y contraseña introducido son correctos.
 
@@ -184,7 +152,7 @@ Ya tendremos preparado nuestro servidor web para poder ver las vulnerabilidades 
 
 Si introducimos el usuario **admin** y la contraseña **admin123** la consulta dice que es usuario y contraseña correcta y nos dejaría logearnos en la página.
 
-![](images/sqli25.png)
+![](images/8.png)
 
 Como vemos, el problema se produce debido a que hacemos la consulta que hacemos a la base de datos es la siguiente:
 
@@ -207,12 +175,9 @@ Para realizar la explotación, en el campo "Usuario" ingresar:
 ' OR '1'='1' -- -
 ~~~
 
-![](images/sqli20.png)
+![](images/9.png)
 
 > Resultado esperado: Inicia sesión sin credenciales válidas.
-
-![](images/sqli21.png)
-
 
 **Obtener credenciales de la base de datos**
 
@@ -224,7 +189,7 @@ Para realizar la explotación, en el campo "Usuario" ingresar:
 
 > Resultado esperado: Se muestran todos los usuarios y contraseñas.
 
-![](images/sqli22.png)
+![](images/10.png)
 
 
 **Problemas del primer código (Inseguro)**
@@ -307,11 +272,13 @@ La función **addslashes()** nos permite hacerlo, ya que Devuelve una cadena con
 
 Por lo tanto, modificamos el archivo anterior, introduciendo las lineas de escape de caracteres especiales tanto del campo de usuario como de la contraseña.
 
-![](images/sqli19.png)
+![](images/11.png)
+
+![](images/12.png)
 
 El resultado es que ya no funciona la inyección SQL:
 
-![](images/sqli24.png)
+![](images/13.png)
 
 
 **Mejoras en el segundo código (Más seguro, pero aún con problemas)**
@@ -415,6 +382,11 @@ $conn->close();
 </form>
 ~~~
 
+![](images/14.png)
+
+![](images/15.png)
+
+![](images/16.png)
 
 **Explicación de las mejoras**
 ---
@@ -435,7 +407,6 @@ $hashed_password = password_hash("tu_contraseña", PASSWORD_DEFAULT);
 ~~~
 
 A la hora de leerla usaríamos la función:  **password_verify()**	
-
 
 ## ENTREGA
 ---
